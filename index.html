@@ -18,36 +18,276 @@
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
+    
     <button id="startRecording">Start</button>
     <button id="stopRecording">Stop</button>
     <button id="testBinary">Binary</button>
     <input id="file" type="file" />
+    
+    <button id="init">Init</button>
+    <button id="start">Start Stream</button>
+    <button id="pause">pause Record to Stream</button>
+    <button id="resume">resume Recording to Stream</button>
+    <button id="stopButton">Stop Stream</button>
+      <h2>Recordings</h2>
+  <ul id="recordingslist"></ul>
+
+  <h2>Log</h2>
+  <pre id="log"></pre>
+
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="socket.io-stream.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="recorder.min.js"></script>
+    <script src="encoderWorker.min.js"></script>
 <script>
   var socket = io();
+  var recorder
 
+  //try it here first
+  //var stream = ss.createStream();
+  //caused same problem
+
+  //attempt to build frontend for stream
+  $('#start').click(function(){
+    recorder.start();
+    //stream = ss.createStream();
+    ///ss(socket).emit('stream-message', stream);
+    //emitting up here seeeems to stop all errors??? 
+    
+
+    //ss(socket).emit('stream-message', stream);
+    console.log("temporarily this does nothing but start the program");
+
+    //ss.stream.emit('stream', 'Holaaaaa from the stream clicker');
+    //console.log("What happens when u look at stream? : " + stream);
+    //check if browser will support it
+
+
+     // if (!navigator.getUserMedia)
+       // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+     // navigator.mozGetUserMedia || navigator.msGetUserMedia;
   
+
+
+
+    //calls success funct if successful... somnehew
+    //  if (navigator.getUserMedia) {
+      //  navigator.getUserMedia({audio:true}, success, function(e) {
+        //  alert('Error capturing audio.');
+      //  });
+   //   } else alert('getUserMedia not supported in this browser.');
+
+      //set recording to false
+      //var recording = false;
+    });
+
+
+
+      $('#pause').click(function(){
+        console.log("pauseme");
+        recorder.pause();
+        //recording = true;
+        //made that shit global
+        //stream = ss.createStream();
+        //console.log("recording");
+
+        //same fuckin story let's go back 2 square 1
+      });
+
+      $('#resume').click(function(){
+        console.log("You've stopped the recordin, I think")
+        recorder.resume();//recording = false;
+      });
+
+      $('#stopButton').click(function(){
+        console.log("Now, let's stop the stream...")
+        //recording = false;
+
+        recorder.stop();
+        //stream.end();
+      });
+
+
+      function success(e) {
+        audioContext = window.AudioContext || window.webkitAudioContext;
+        console.log(audioContext);
+        context = new audioContext();
+        console.log("We got to success function");
+
+        // the sample rate is in context.sampleRate
+        //audioInput = context.createMediaStreamSource(e);
+        //console.log(audioInput);
+        //console.log("I guess this is what is in audioInput": + audioInput);
+
+        //var bufferSize = 2048;
+        //recorder = context.createScriptProcessor(bufferSize, 1, 1);
+        //console.log("What is the recorder? : " + recorder)
+
+        //recorder.onaudioprocess = function(e){
+          //if(!recording) return;
+          //console.log ('recording');
+          //ss(socket).emit('stream-message', stream);
+          //var left = e.inputBuffer.getChannelData(0);
+          //console.log("we made it to the onaudioprocess");
+         // console.log("this is waht left is: " + left);
+
+          //stream.write(convertoFloat32ToInt16(left));
+
+          //the below line is DEF what connects it to the server. What gives? Try moving it around????
+          
+
+         // ss.createBlobReadStream(ss.Buffer(convertoFloat32ToInt16(left))).pipe(stream);
+
+          //ss.Buffer(convertoFloat32ToInt16(left)).pipe(stream);
+
+
+
+          //ss.createBlobReadStream(new ss.Buffer(convertoFloat32ToInt16(left))).pipe(stream);
+
+          //stream.write(new ss.Buffer(convertoFloat32ToInt16(left)));
+
+          //(new ss.Buffer([0, 1, 2]));
+          //stream.emit('stream', stream);
+          
+          //console.log(left);
+          //console.log("You got to the audio process function and this is what left is "+ left);
+          //stream.write(convertoFloat32ToInt16(left));
+          //console.log("I wonder what file is: "+ file);
+
+
+          //ss(socket).emit('stream-message', ss.createBlobReadStream().pipe(stream));
+          
+          //ss.createBlobReadStream().pipe(convertoFloat32ToInt16(left))
+  //       }
+
+  //       audioInput.connect(recorder)
+  //       console.log("we've reached the audio input connect, not sure waht this does");
+
+  //       recorder.connect(context.destination); 
+  //       console.log("And we've reached the recorder.connect. Also not sure what THIS does!");
+  //       //ss(socket).emit('stream-message-1', stream);
+  //     }
+
+  //     function convertoFloat32ToInt16(buffer) {
+  //       console.log("tryign to convert to floats...")
+  //       var l = buffer.length;
+  //       console.log("this is the buffer length " +l);
+  //       var buf = new Int16Array(l)
+
+  //       while (l--) {
+  //           buf[l] = buffer[l]*0xFFFF;    //convert to 16 bit
+  //       }
+  //       return buf.buffer
+  //       console.log(buf.buffer);
+  //       }
+   };
+
+init.addEventListener( "click", function(){
+
+if (!Recorder.isRecordingSupported()) {
+        return screenLogger("Recording features are not supported in your browser.");
+      }
+
+      recorder = new Recorder({
+        //monitorGain: parseInt(monitorGain.value, 10),
+        //numberOfChannels: parseInt(numberOfChannels.value, 10),
+        //bitRate: parseInt(bitRate.value,10),
+        //encoderSampleRate: parseInt(encoderSampleRate.value,10),
+        encoderPath: "encoderWorker.min.js"
+      });
+
+      recorder.addEventListener( "start", function(e){
+        screenLogger('Recorder is started');
+        init.disabled = start.disabled = resume.disabled = true;
+        pause.disabled = stopButton.disabled = false;
+      });
+
+      recorder.addEventListener( "stop", function(e){
+        screenLogger('Recorder is stopped');
+        init.disabled = false;
+        pause.disabled = resume.disabled = stopButton.disabled = start.disabled = true;
+      });
+
+      recorder.addEventListener( "pause", function(e){
+        screenLogger('Recorder is paused');
+        init.disabled = pause.disabled = start.disabled = true;
+        resume.disabled = stopButton.disabled = false;
+      });
+
+      recorder.addEventListener( "resume", function(e){
+        screenLogger('Recorder is resuming');
+        init.disabled = start.disabled = resume.disabled = true;
+        pause.disabled = stopButton.disabled = false;
+      });
+
+      recorder.addEventListener( "streamError", function(e){
+        screenLogger('Error encountered: ' + e.error.name );
+      });
+
+      recorder.addEventListener( "streamReady", function(e){
+        init.disabled = pause.disabled = resume.disabled = stopButton.disabled = true;
+        start.disabled = false;
+        screenLogger('Audio stream is ready.');
+      });
+
+      recorder.addEventListener( "dataAvailable", function(e){
+        console.log("data is now available")
+        var dataBlob = new Blob( [e.detail], { type: 'audio/ogg' } );
+        //var dataBlob2= new Buffer(e.detail);
+        console.log(dataBlob.name);
+        console.log(dataBlob);
+        socket.emit('audioURL', dataBlob)
+        //console.log(e.detail);
+        console.log(dataBlob);
+        var fileName = new Date().toISOString() + ".ogg";
+        var url = URL.createObjectURL( dataBlob );
+        //socket.emit('audioURL', dataBlob);
+
+        var audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = url;
+
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.innerHTML = link.download;
+
+        var li = document.createElement('li');
+        li.appendChild(link);
+        li.appendChild(audio);
+
+        recordingslist.appendChild(li);
+      });
+
+      recorder.initStream();
+    });
+
+    function screenLogger(text, data) {
+      log.innerHTML += "\n" + text + " " + (data || '');
+    }
+
   //form emits text to server
   $('form').submit(function(){
     socket.emit('chat message', $('#m').val());
     $('#m').val('');
     return false;
   });
-
+/*
   //testing file uplaod
   $('#file').change(function(e) {
       var file = e.target.files[0];
       var stream = ss.createStream();
    
       // upload a file to the server. 
-      ss(socket).emit('file', stream, {size: file.size});
+      ss(socket).emit('stream-message', stream, {size: file.size});
       console.log("file size is : " + file.size);
       ss.createBlobReadStream(file).pipe(stream);
-    });
+    });*/
 
   //testing binary data
+
   $('#testBinary').click(function(){
     console.log("binary test incoming");
     socket.emit('m', 'hola from js clinet;');
@@ -81,6 +321,7 @@
     var bufView  = new Uint8Array(msg);
     console.log(msg);
   });
+
 
 
 </script>
