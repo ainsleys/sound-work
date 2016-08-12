@@ -31,6 +31,7 @@
     <button id="stopButton">Stop Stream</button>
       <h2>Recordings</h2>
   <ul id="recordingslist"></ul>
+  <ul id="recordingServer"></ul>
 
   <h2>Log</h2>
   <pre id="log"></pre>
@@ -44,6 +45,7 @@
 <script>
   var socket = io();
   var recorder
+
 
   //try it here first
   //var stream = ss.createStream();
@@ -116,72 +118,6 @@
         context = new audioContext();
         console.log("We got to success function");
 
-        // the sample rate is in context.sampleRate
-        //audioInput = context.createMediaStreamSource(e);
-        //console.log(audioInput);
-        //console.log("I guess this is what is in audioInput": + audioInput);
-
-        //var bufferSize = 2048;
-        //recorder = context.createScriptProcessor(bufferSize, 1, 1);
-        //console.log("What is the recorder? : " + recorder)
-
-        //recorder.onaudioprocess = function(e){
-          //if(!recording) return;
-          //console.log ('recording');
-          //ss(socket).emit('stream-message', stream);
-          //var left = e.inputBuffer.getChannelData(0);
-          //console.log("we made it to the onaudioprocess");
-         // console.log("this is waht left is: " + left);
-
-          //stream.write(convertoFloat32ToInt16(left));
-
-          //the below line is DEF what connects it to the server. What gives? Try moving it around????
-          
-
-         // ss.createBlobReadStream(ss.Buffer(convertoFloat32ToInt16(left))).pipe(stream);
-
-          //ss.Buffer(convertoFloat32ToInt16(left)).pipe(stream);
-
-
-
-          //ss.createBlobReadStream(new ss.Buffer(convertoFloat32ToInt16(left))).pipe(stream);
-
-          //stream.write(new ss.Buffer(convertoFloat32ToInt16(left)));
-
-          //(new ss.Buffer([0, 1, 2]));
-          //stream.emit('stream', stream);
-          
-          //console.log(left);
-          //console.log("You got to the audio process function and this is what left is "+ left);
-          //stream.write(convertoFloat32ToInt16(left));
-          //console.log("I wonder what file is: "+ file);
-
-
-          //ss(socket).emit('stream-message', ss.createBlobReadStream().pipe(stream));
-          
-          //ss.createBlobReadStream().pipe(convertoFloat32ToInt16(left))
-  //       }
-
-  //       audioInput.connect(recorder)
-  //       console.log("we've reached the audio input connect, not sure waht this does");
-
-  //       recorder.connect(context.destination); 
-  //       console.log("And we've reached the recorder.connect. Also not sure what THIS does!");
-  //       //ss(socket).emit('stream-message-1', stream);
-  //     }
-
-  //     function convertoFloat32ToInt16(buffer) {
-  //       console.log("tryign to convert to floats...")
-  //       var l = buffer.length;
-  //       console.log("this is the buffer length " +l);
-  //       var buf = new Int16Array(l)
-
-  //       while (l--) {
-  //           buf[l] = buffer[l]*0xFFFF;    //convert to 16 bit
-  //       }
-  //       return buf.buffer
-  //       console.log(buf.buffer);
-  //       }
    };
 
 init.addEventListener( "click", function(){
@@ -268,59 +204,48 @@ if (!Recorder.isRecordingSupported()) {
       log.innerHTML += "\n" + text + " " + (data || '');
     }
 
-  //form emits text to server
-  $('form').submit(function(){
-    socket.emit('chat message', $('#m').val());
-    $('#m').val('');
-    return false;
-  });
-/*
-  //testing file uplaod
-  $('#file').change(function(e) {
-      var file = e.target.files[0];
-      var stream = ss.createStream();
-   
-      // upload a file to the server. 
-      ss(socket).emit('stream-message', stream, {size: file.size});
-      console.log("file size is : " + file.size);
-      ss.createBlobReadStream(file).pipe(stream);
-    });*/
 
-  //testing binary data
+    socket.on('return audio', function(practice){
+      var url = practice;
 
-  $('#testBinary').click(function(){
-    console.log("binary test incoming");
-    socket.emit('m', 'hola from js clinet;');
-  })
-  //button emits 56 to server
-  $('#startRecording').click(function(){
-    console.log("only when clicked! Client gets clicked.");
-    socket.emit('test message', 56);
-  });
+      var audio = document.createElement('audio');
+      audio.controls = true;
+      console.log(url);
+      audio.src = url;
+      var li = document.createElement('li');
+      li.appendChild(audio);
 
-  $('#stopRecording').click(function(){
-    console.log("only when clicked! Client gets clicked. this is the stop button");
-    socket.emit('test message 2', "stop me oh ho ho stop me");
-  });
+      recordingServer.appendChild(li);
+      console.log('audio came from server A OK');
+    });
 
 
+
+
+        // var fileName = new Date().toISOString() + "s.ogg";
+        // var url = URL.createObjectURL( dataBlob );
+        // //socket.emit('audioURL', dataBlob);
+
+        // var audio = document.createElement('audio');
+        // audio.controls = true;
+        // audio.src = url;
+
+        // var link = document.createElement('a');
+        // link.href = url;
+        // link.download = fileName;
+        // link.innerHTML = link.download;
+
+        // var li = document.createElement('li');
+        // li.appendChild(link);
+        // li.appendChild(audio);
+
+        // recordingslist.appendChild(li);
+  
   //Includes message in the page itself
     socket.on('chat message', function(msg){
     $('#messages').append($('<li>').text(msg));
   });
 
-//should print like, 56
-   socket.on('test message', function(data){
-     $('#messages').append($('<li>').text(data));
-   });
-   socket.on('test message 2', function(data){
-     $('#messages').append($('<li>').text(data));
-   });
-
-   socket.on('m', function(msg){
-    var bufView  = new Uint8Array(msg);
-    console.log(msg);
-  });
 
 
 
