@@ -42,6 +42,9 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="recorder.min.js"></script>
     <script src="encoderWorker.min.js"></script>
+
+
+
 <script>
   var socket = io();
   var recorder
@@ -58,6 +61,7 @@ window.addEventListener("keydown", handleStart, false);
 window.addEventListener("keydown", handlePause, false);
 window.addEventListener("keydown", handleResume, false);
 window.addEventListener("keydown", handleStop, false);
+window.addEventListener("keydown", handleInit, false);
 
 function handleStart(e){
   if (e.keyCode=="83"){
@@ -83,6 +87,13 @@ function handleStop(e){
     console.log("G stops the program");
   }
 }
+function handleInit(e){
+  if (e.keyCode=="65"){
+    initialize();
+    console.log("A initializes the program");
+  }
+}
+
 
 
       $('#pause').click(function(){
@@ -109,7 +120,8 @@ function handleStop(e){
 
    };
 
-init.addEventListener( "click", function(){
+//init.addEventListener( "click", function()
+function initialize() {
 
 if (!Recorder.isRecordingSupported()) {
         return screenLogger("Recording features are not supported in your browser.");
@@ -187,7 +199,7 @@ if (!Recorder.isRecordingSupported()) {
       });
 
       recorder.initStream();
-    });
+    };
 
     function screenLogger(text, data) {
       log.innerHTML += "\n" + text + " " + (data || '');
