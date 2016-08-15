@@ -19,10 +19,10 @@
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
     
-    <button id="startRecording">Start</button>
+  <!--  <button id="startRecording">Start</button>
     <button id="stopRecording">Stop</button>
     <button id="testBinary">Binary</button>
-    <input id="file" type="file" />
+    <input id="file" type="file" />-->
     
     <button id="init">Init</button>
     <button id="start">Start Stream</button>
@@ -46,56 +46,48 @@
   var socket = io();
   var recorder
 
-
-  //try it here first
-  //var stream = ss.createStream();
-  //caused same problem
+//Get rid of buttons, change to events.
 
   //attempt to build frontend for stream
-  $('#start').click(function(){
+  /*$('#start').click(function(){
     recorder.start();
-    //stream = ss.createStream();
-    ///ss(socket).emit('stream-message', stream);
-    //emitting up here seeeems to stop all errors??? 
-    
+    console.log("this starts the program");
 
-    //ss(socket).emit('stream-message', stream);
-    console.log("temporarily this does nothing but start the program");
+    });*/
+window.addEventListener("keydown", handleStart, false);
+window.addEventListener("keydown", handlePause, false);
+window.addEventListener("keydown", handleResume, false);
+window.addEventListener("keydown", handleStop, false);
 
-    //ss.stream.emit('stream', 'Holaaaaa from the stream clicker');
-    //console.log("What happens when u look at stream? : " + stream);
-    //check if browser will support it
-
-
-     // if (!navigator.getUserMedia)
-       // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-     // navigator.mozGetUserMedia || navigator.msGetUserMedia;
-  
-
-
-
-    //calls success funct if successful... somnehew
-    //  if (navigator.getUserMedia) {
-      //  navigator.getUserMedia({audio:true}, success, function(e) {
-        //  alert('Error capturing audio.');
-      //  });
-   //   } else alert('getUserMedia not supported in this browser.');
-
-      //set recording to false
-      //var recording = false;
-    });
-
+function handleStart(e){
+  if (e.keyCode=="83"){
+    recorder.start();
+    console.log("this starts the program with S");
+  }
+}
+function handlePause(e){
+  if (e.keyCode=="68"){
+    recorder.pause();
+    console.log("D pauses the program");
+  }
+}
+function handleResume(e){
+  if (e.keyCode=="70"){
+    recorder.resume();
+    console.log("F resumes the program");
+  }
+}
+function handleStop(e){
+  if (e.keyCode=="71"){
+    recorder.stop();
+    console.log("G stops the program");
+  }
+}
 
 
       $('#pause').click(function(){
         console.log("pauseme");
         recorder.pause();
-        //recording = true;
-        //made that shit global
-        //stream = ss.createStream();
-        //console.log("recording");
-
-        //same fuckin story let's go back 2 square 1
       });
 
       $('#resume').click(function(){
@@ -105,10 +97,7 @@
 
       $('#stopButton').click(function(){
         console.log("Now, let's stop the stream...")
-        //recording = false;
-
         recorder.stop();
-        //stream.end();
       });
 
 
@@ -219,27 +208,6 @@ if (!Recorder.isRecordingSupported()) {
       console.log('audio came from server A OK');
     });
 
-
-
-
-        // var fileName = new Date().toISOString() + "s.ogg";
-        // var url = URL.createObjectURL( dataBlob );
-        // //socket.emit('audioURL', dataBlob);
-
-        // var audio = document.createElement('audio');
-        // audio.controls = true;
-        // audio.src = url;
-
-        // var link = document.createElement('a');
-        // link.href = url;
-        // link.download = fileName;
-        // link.innerHTML = link.download;
-
-        // var li = document.createElement('li');
-        // li.appendChild(link);
-        // li.appendChild(audio);
-
-        // recordingslist.appendChild(li);
   
   //Includes message in the page itself
     socket.on('chat message', function(msg){
